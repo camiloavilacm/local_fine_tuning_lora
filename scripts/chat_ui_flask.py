@@ -1,29 +1,40 @@
-#!/usr/bin/env python3
+#!/usr/bin/env /opt/homebrew/bin/python3
 """
 Simple Flask-based Chat UI for Fine-Tuned Book Expert
-More stable than Gradio for local use.
 """
 
-import os
-from flask import Flask, render_template_string, request, jsonify
-from mlx_lm import generate
 import sys
+
+# Add paths for mlx, mlx_lm, and project
+sys.path.insert(0, "/opt/homebrew/lib/python3.14/site-packages")
+sys.path.insert(0, "/Users/camiloavila/Library/Python/3.13/lib/python/site-packages")
+sys.path.insert(0, "/Users/camiloavila/Documents/local_fine_tuning_lora")
+sys.path.insert(0, "/Users/camiloavila/Documents/local_fine_tuning_lora/scripts")
+
+from flask import Flask, render_template_string, request, jsonify
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent))
 from guardrails import InputGuardrail, OutputGuardrail
+from rag import get_context_for_query
 
 
-MODEL = "HuggingFaceTB/SmolLM2-1.7B-Instruct"
-ADAPTER_PATH = "./adapters/v1"
+MODEL = "mlx-community/Llama-3.2-3B-Instruct-4bit"
+ADAPTER_PATH = "./adapters/llama"
 MAX_TOKENS = 256
 
 input_guardrail = InputGuardrail()
 output_guardrail = OutputGuardrail()
 
-SYSTEM_PROMPT = """Eres un asistente útil que responde preguntas sobre el libro
-'El gran libro de Lucía, mi pediatra' de Lucía Galán Bertrand.
-Responde siempre en español de forma clara y concisa."""
+_model_cache = None
+_tokenizer_cache = None
+
+
+def get_model():
+    """Load and cache the model."""
+    global _model_cache, _tokenizer_cache
+    if _model_cache is None:
+        from mlx_lm.utils import load
+        _model_cache, _tokenizer_cache = load(MODEL, adapter_path=ADAPTER_PATH if ADAPTER_PATH else None)
+    return _model_cache, _tokenizer_cache
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -145,12 +156,21 @@ def chat():
     if is_blocked:
         return jsonify({"response": response})
 
-    prompt = f"{SYSTEM_PROMPT}\n\nPregunta: {message}\n\nRespuesta:"
+    rag_context = get_context_for_query(message)
+    full_prompt = f"""Eres un asistente del libro 'El gran libro de Lucía, mi pediatra'.
+
+Información del libro:
+{rag_context}
+
+Usuario: {message}
+Respuesta:"""
 
     try:
-        response = generate(MODEL, ADAPTER_PATH, prompt=prompt, max_tokens=MAX_TOKENS)
+        model, tokenizer = get_model()
+        from mlx_lm import generate
+        response = generate(model, tokenizer, prompt=full_prompt, max_tokens=MAX_TOKENS)
         is_blocked, safe_response = output_guardrail.check(response)
-        return jsonify({"response": safe_response if is_blocked else response})
+        return jsonify({"response": safe_response})
     except Exception as e:
         return jsonify({"response": f"Error: {str(e)}"})
 

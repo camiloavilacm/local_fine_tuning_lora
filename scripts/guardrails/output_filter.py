@@ -46,6 +46,12 @@ class OutputGuardrail:
         Check if response should be blocked.
         Returns: (is_blocked, replacement_message)
         """
+        import re
+        response = re.sub(r'<\|[^|]*\|>', '', response).strip()
+        response = re.sub(r'<\|.*', '', response).strip()
+        response = re.sub(r'Usuario:.*', '', response).strip()
+        response = re.sub(r'\nUsuario:.*', '', response).strip()
+        
         is_blocked = self.blocklist.is_blocked(response)
 
         if is_blocked:
@@ -60,7 +66,7 @@ class OutputGuardrail:
             self.logger.warning(f"Blocked output: general")
             return True, self.DEFAULT_RESPONSE
 
-        return False, None
+        return False, response
 
     def filter(self, response: str) -> str:
         """Filter response, return safe version or block message."""
