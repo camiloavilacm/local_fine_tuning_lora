@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent / "scripts"))
 
-from chat_ui import main
+from chat_ui_flask import app
 
 if __name__ == "__main__":
-    main()
+    app.run(host="0.0.0.0", port=7860, debug=False)

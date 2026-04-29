@@ -1,8 +1,8 @@
 # Core MLX Dependencies
 mlx-lm
 
-# UI
-gradio
+# UI (Flask for stable local hosting)
+flask
 
 # Experiment Tracking
 wandb
