@@ -11,12 +11,12 @@ class Blocklist:
 
     BLOCKLISTS: Dict[str, List[str]] = {
         'violence_es': [
-            'bomba', 'explosivo', 'arma', 'matar', 'asesinar', 'morir', 'muerte',
+            'bomba', 'explosivo', 'arma', 'matar', 'asesinar',
             'atacar', 'apunalar', 'disparar', 'golpear', 'herir', 'tortura',
             'genocidio', 'masacre', 'suicidio', 'autolesión', 'armas',
         ],
         'violence_en': [
-            'bomb', 'explosive', 'weapon', 'kill', 'murder', 'die', 'death',
+            'bomb', 'explosive', 'weapon', 'kill', 'murder',
             'attack', 'stab', 'shoot', 'hit', 'hurt', 'torture', 'genocide',
             'massacre', 'suicide', 'self-harm', 'guns',
         ],
@@ -61,22 +61,27 @@ class Blocklist:
         for keywords in self.BLOCKLISTS.values():
             self.all_keywords.update(keyword.lower() for keyword in keywords)
 
-    def check(self, text: str) -> Dict[str, bool]:
-        """Check text against all blocklists."""
-        text_lower = text.lower()
-        text_words = set(text_lower.split())
-
-        results = {}
-        for category, keywords in self.BLOCKLISTS.items():
-            found = [k for k in keywords if k.lower() in text_lower]
-            results[category] = len(found) > 0
-
-        return results
-
     def is_blocked(self, text: str) -> bool:
-        """Return True if any blocklist triggers."""
+        """Return True if any blocklist triggers (word boundary matching)."""
+        text_lower = text.lower()
         results = self.check(text)
         return any(results.values())
+
+    def check(self, text: str) -> Dict[str, bool]:
+        """Check text against all blocklists using word boundaries."""
+        text_lower = text.lower()
+        import re
+        
+        results = {}
+        for category, keywords in self.BLOCKLISTS.items():
+            found = []
+            for keyword in keywords:
+                pattern = r'\b' + re.escape(keyword.lower()) + r'\b'
+                if re.search(pattern, text_lower):
+                    found.append(keyword)
+            results[category] = len(found) > 0
+        
+        return results
 
     def get_blocked_categories(self, text: str) -> List[str]:
         """Return list of triggered categories."""
