@@ -1,0 +1,60 @@
+enabled: true
+log_blocked: true
+log_path: logs/guardrails.log
+
+input:
+  enabled: true
+  filters:
+    - type: blocklist
+      languages:
+        - es
+        - en
+
+output:
+  enabled: true
+  filters:
+    - type: blocklist
+      languages:
+        - es
+        - en
+
+filters:
+  violence:
+    enabled: true
+    response_es: "No puedo ayudarte con contenido violento."
+    response_en: "I cannot help with violent content."
+
+  hate:
+    enabled: true
+    response_es: "No puedo ayudarte con contenido de odio."
+    response_en: "I cannot help with hateful content."
+
+  self_harm:
+    enabled: true
+    priority: high
+    response_es: "Si estás pensando en hacerte daño, por favor busca ayuda profesional. Línea de ayuda: 024 (España)"
+    response_en: "If you're thinking of hurting yourself, please seek professional help. Helpline: 988 (US)"
+
+  sexual:
+    enabled: true
+    response_es: "No puedo generar contenido sexual explícito."
+    response_en: "I cannot generate explicit sexual content."
+
+  illegal:
+    enabled: true
+    response_es: "No puedo ayudarte con actividades ilegales."
+    response_en: "I cannot help with illegal activities."
+
+classifier:
+  enabled: false
+  model: martin-ha/toxic-comment-model
+  memory_threshold_mb: 14000
+  threshold: 0.7
+
+language_drift:
+  enabled: true
+  max_english_percent: 5.0
+
+response_templates:
+  blocked_input: "Lo siento, no puedo ayudarte con esa solicitud. ¿Hay algo más en lo que pueda ayudarte?"
+  blocked_output: "Lo siento, no puedo generar esa respuesta. ¿Podrías intentar con otra pregunta?"

@@ -1,0 +1,46 @@
+model:
+  name: mlx-community/SmolLM2-1.7B-Instruct-4bit
+  adapter_path: ./adapters/v1
+
+lora:
+  rank: 16
+  alpha: 16
+  dropout: 0.0
+
+training:
+  iterations: 1000
+  batch_size: 1
+  learning_rate: 1e-4
+  steps_per_report: 10
+  steps_per_eval: 100
+  seed: 42
+
+checkpoint:
+  enabled: true
+  interval: 100
+  save_best: true
+  path: ./adapters/v1/checkpoints
+
+early_stopping:
+  enabled: true
+  patience: 50
+  min_delta: 0.01
+
+data:
+  train_path: ./data/processed/train.jsonl
+  val_path: ./data/processed/val.jsonl
+  sample_path: ./data/samples/sample_train.jsonl
+
+wandb:
+  enabled: false
+  project: smollm-spanish-finetune
+  entity: null
+  tags:
+    - smollm2
+    - spanish
+    - lora
+
+hardware:
+  memory_limit_mb: 14000
+  metal_cache_percent: 0.8
+  thermal_pause_threshold: 95

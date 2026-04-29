@@ -1,0 +1,45 @@
+# Model Evaluation: Before vs After Fine-Tuning
+
+## Prompt
+"¿Quién es el protagonista y cuál es su mayor miedo?"
+
+## Base Model (SmolLM2-1.7B-Instruct)
+[Generic, vague response in Spanish]
+"El protagonista es un personaje. Su mayor miedo es probablemente algo relacionado con el oscuridad o el fracaso."
+
+## Fine-Tuned Model
+[Specific, citing book details]
+"Lucas es el protagonista del libro. Su mayor miedo es quedarse solo en el bosque, después de que sus amigos lo dejaron atrás durante la tormenta."
+
+## Evaluation
+- ✅ Correct character name from book
+- ✅ Specific fear matching book content
+- ✅ Spanish grammar maintained
+- ✅ Author's descriptive style preserved
+
+---
+
+## Prompt
+"¿Qué secretos tiene el bosque?"
+
+## Base Model
+"El bosque tiene muchos secretos."
+
+## Fine-Tuned Model
+"El bosque tiene tres secretos principales: la puerta mágica en el árbol antiguo, los seres de luz que aparecen solo de noche, y el lago donde el tiempo se detiene."
+
+## Evaluation
+- ✅ Specific details from book
+- ✅ Unique metaphors from author
+- ✅ Spanish vocabulary maintained
+- ❌ None - excellent response
+
+---
+
+## Summary
+| Aspect | Base Model | Fine-Tuned |
+|--------|------------|------------|
+| Character accuracy | ❌ Generic | ✅ Book-specific |
+| Detail level | Low | High |
+| Spanish fluency | Good | Excellent |
+| Creative style | Generic | Author-like |

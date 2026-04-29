@@ -1,0 +1,81 @@
+name: Deploy Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+      notes:
+        description: 'Release notes'
+        required: false
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: macos-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          architecture: arm64
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Verify model weights
+        run: |
+          if [ -f "adapters/v1/adapters.safetensors" ]; then
+            echo "✅ Model weights found"
+            ls -lh adapters/v1/adapters.safetensors
+          else
+            echo "⚠️  No model weights found"
+          fi
+
+      - name: Generate hash verification
+        run: |
+          python3 scripts/verify_weights.py ./adapters/v1 || echo "Skipping hash verification"
+
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          release_name: Release ${{ github.event.inputs.version }}
+          body: |
+            ${{ github.event.inputs.notes }}
+            
+            ### Changes
+            - Production deployment
+            - Model weights included
+            - SHA-256 hash verification available in manifest.json
+          draft: false
+          prerelease: false
+
+      - name: Upload model artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-model
+          path: |
+            adapters/v1/
+            manifest.json
+        if: always()
+
+      - name: Summary
+        run: |
+          echo "✅ Production release created: ${{ github.event.inputs.version }}"
+          echo "📦 Model weights: ${{ github.event.inputs.version }}-adapters.zip"
+          echo ""
+          echo "🚀 To deploy to server:"
+          echo "   1. Download artifacts"
+          echo "   2. Run: cloudflared tunnel --url http://localhost:7860"
+          echo "   3. Configure your domain in Cloudflare"

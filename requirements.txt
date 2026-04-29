@@ -1,0 +1,22 @@
+# Core MLX Dependencies
+mlx-lm
+mlx-explore
+
+# Experiment Tracking
+wandb
+tqdm
+
+# Data Processing
+ebooklib
+beautifulsoup4
+
+# Utilities
+numpy
+safetensors
+
+# Optional: ML Classifier for Guardrails
+# torch
+# transformers
+
+# Optional: Enhanced Evaluation
+# sentence-transformers

@@ -1,0 +1,30 @@
+{
+  "model_name": "SmolLM2-1.7B-Instruct",
+  "base_model": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+  "adapter_path": "./adapters/v1",
+  "training_date": "2025-04-29",
+  "training_config": {
+    "iterations": 1000,
+    "batch_size": 1,
+    "learning_rate": 1e-4,
+    "fine_tune_type": "lora"
+  },
+  "final_metrics": {
+    "train_loss": 0.170,
+    "val_loss": 2.545,
+    "val_perplexity": 12.75,
+    "peak_memory_gb": 4.442
+  },
+  "data": {
+    "source": "El_gran_libro_de_Lucia.epub",
+    "train_samples": 200,
+    "val_samples": 19,
+    "total_chapters": 73,
+    "qa_pairs": 219
+  },
+  "hardware": {
+    "device": "Apple Silicon M3",
+    "ram_gb": 16,
+    "python_version": "3.9"
+  }
+}
