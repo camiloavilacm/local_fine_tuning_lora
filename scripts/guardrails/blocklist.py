@@ -29,9 +29,9 @@ class Blocklist:
             'insult', 'contempt', 'inferior', 'superior', 'race', 'gender',
         ],
         'self_harm_es': [
-            'suicid', 'autolesión', 'hacerse daño', 'quitarse la vida',
+            'suicid', 'suicidar', 'suicidarme', 'autolesión', 'hacerse daño', 'quitarse la vida',
             'cortarse', 'arrancarse', 'no vale la pena', 'mejor muerto',
-            'hacerme daño', 'terminar con mi vida',
+            'hacerme daño', 'terminar con mi vida', 'matarme', 'matarme',
         ],
         'self_harm_en': [
             'suicide', 'self-harm', 'hurt yourself', 'kill yourself',
